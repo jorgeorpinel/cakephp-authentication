@@ -21,11 +21,11 @@ class AuthenticationComponent {
 	var $controller;
 
 	function startup(&$controller) {
-	  $this->controller =& $controller;
+		$this->controller =& $controller;
 	}
 
 	/**
-   * Verifies the existence of a user with a username and a password.
+	* Verifies the existence of a user with a username and a password.
 	 * Assumes there is no repeated usernames in the users model's data.
 	 *
 	 * Use data['Login']['fromURL'] to tell to which cake's sintaxed URL to return after login.
@@ -52,163 +52,163 @@ class AuthenticationComponent {
 	 * Note: not all values must be overwriten, some rest will be defaultes.
 	 */
 	function login($loginOptions = null) {
-	  // Usage validation. If user is already signed on, redirects:
-	  if($this->controller->Session->check(
-	    isset($loginOptions['userId'])?$loginOptions['userId']:'User.id'))
-	    $this->controller->redirect(isset($loginOptions['redirectTo'])?$loginOptions['redirectTo']:'/');
+		// Usage validation. If user is already signed on, redirects:
+		if($this->controller->Session->check(
+		 isset($loginOptions['userId'])?$loginOptions['userId']:'User.id'))
+		 $this->controller->redirect(isset($loginOptions['redirectTo'])?$loginOptions['redirectTo']:'/');
 
-	  // Renders the (empty) login view:
-	  if(empty($this->controller->data))
-	  {
-	    $this->controller->render();
-	    return;
-	  }
+		// Renders the (empty) login view:
+		if(empty($this->controller->data))
+		{
+		 $this->controller->render();
+		 return;
+		}
 
-//	  $data;
-//	  $options;
-//	  $user;
-//	  $username;
-//	  $password;
-//	  $succeded;
+//		$data;
+//		$options;
+//		$user;
+//		$username;
+//		$password;
+//		$succeded;
 
-	  $data =& $this->controller->data;
+		$data =& $this->controller->data;
 
-	  // Login options:
-	  $options = array(
-	    'userModelPtr' => isset($loginOptions['userModelPtr'])?$loginOptions['userModelPtr']:$this->User, // XXX will fail if no User model exists
-	    'username' => isset($loginOptions['username'])?$loginOptions['username']:'username',
-	    'password' => isset($loginOptions['password'])?$loginOptions['password']:'password',
-	    'encoding' => isset($loginOptions['encoding'])?$loginOptions['encoding']:null,
-	    'avoidReturn' => isset($loginOptions['avoidReturn'])?$loginOptions['avoidReturn']:false,
-	    'failed' => array(
-	      'postFailure' =>
-	        isset($loginOptions['failed']['postFailure'])?$loginOptions['failed']['postFailure']:null,
-	      'invalidate' =>
-	        isset($loginOptions['failed']['invalidate'])?$loginOptions['failed']['invalidate']:null,
-	      'renderView' =>
-	        isset($loginOptions['failed']['renderView'])?$loginOptions['failed']['renderView']:true,
-	      'sessionErr' =>
-	        isset($loginOptions['failed']['sessionErr'])?$loginOptions['failed']['sessionErr']:null,
-	      'flashMsg' => isset($loginOptions['failed']['flashMsg'])?$loginOptions['failed']['flashMsg']:null,
-	      'URL' => isset($loginOptions['failed']['URL'])?$loginOptions['failed']['URL']:'/'
-	    ),
-	    'succeded' => array(
-	      'postLogin' =>
-	        isset($loginOptions['succeded']['postLogin'])?$loginOptions['succeded']['postLogin']:null,
-	      'flashMsg' =>
-	        isset($loginOptions['succeded']['flashMsg'])?$loginOptions['succeded']['flashMsg']:null,
-	      'URL' => isset($loginOptions['succeded']['URL'])?$loginOptions['succeded']['URL']:'/'
-	    ),
-	    'userId' => isset($loginOptions['userId'])?$loginOptions['userId']:'User.id'
-	  );
-	  if($options['userModelPtr'] == null) $options['userModelPtr'] =& $this->controller->User;
+		// Login options:
+		$options = array(
+		 'userModelPtr' => isset($loginOptions['userModelPtr'])?$loginOptions['userModelPtr']:$this->User, // XXX will fail if no User model exists
+		 'username' => isset($loginOptions['username'])?$loginOptions['username']:'username',
+		 'password' => isset($loginOptions['password'])?$loginOptions['password']:'password',
+		 'encoding' => isset($loginOptions['encoding'])?$loginOptions['encoding']:null,
+		 'avoidReturn' => isset($loginOptions['avoidReturn'])?$loginOptions['avoidReturn']:false,
+		 'failed' => array(
+			'postFailure' =>
+				isset($loginOptions['failed']['postFailure'])?$loginOptions['failed']['postFailure']:null,
+			'invalidate' =>
+				isset($loginOptions['failed']['invalidate'])?$loginOptions['failed']['invalidate']:null,
+			'renderView' =>
+				isset($loginOptions['failed']['renderView'])?$loginOptions['failed']['renderView']:true,
+			'sessionErr' =>
+				isset($loginOptions['failed']['sessionErr'])?$loginOptions['failed']['sessionErr']:null,
+			'flashMsg' => isset($loginOptions['failed']['flashMsg'])?$loginOptions['failed']['flashMsg']:null,
+			'URL' => isset($loginOptions['failed']['URL'])?$loginOptions['failed']['URL']:'/'
+		 ),
+		 'succeded' => array(
+			'postLogin' =>
+				isset($loginOptions['succeded']['postLogin'])?$loginOptions['succeded']['postLogin']:null,
+			'flashMsg' =>
+				isset($loginOptions['succeded']['flashMsg'])?$loginOptions['succeded']['flashMsg']:null,
+			'URL' => isset($loginOptions['succeded']['URL'])?$loginOptions['succeded']['URL']:'/'
+		 ),
+		 'userId' => isset($loginOptions['userId'])?$loginOptions['userId']:'User.id'
+		);
+		if($options['userModelPtr'] == null) $options['userModelPtr'] =& $this->controller->User;
 
-	  // Does authentication:
+		// Does authentication:
 
-	  $username = trim($data[$options['userModelPtr']->name][$options['username']]);
-	  $password = trim($data[$options['userModelPtr']->name][$options['password']]);
+		$username = trim($data[$options['userModelPtr']->name][$options['username']]);
+		$password = trim($data[$options['userModelPtr']->name][$options['password']]);
 
-	  // Params can't be empty:
-	  $succeded = true;
-	  if(empty($username) || empty($password)) $succeded = false;
+		// Params can't be empty:
+		$succeded = true;
+		if(empty($username) || empty($password)) $succeded = false;
 
-	  if($succeded) {
-  	  if($options['encoding'] == 'md5') $password = md5($password);
+		if($succeded) {
+		 if($options['encoding'] == 'md5') $password = md5($password);
 
-  	  // Gets user:
-  	  if($options['userModelPtr']->validates()) {
-  		  $user = $options['userModelPtr']->find(  // *Only finds the first match!
-  		    $options['username']." = '$username' AND ".$options['password']." = '$password'"
-  		  );
-  	  }
-  	  if(empty($user)) $succeded = false;  // Authentication failed.
-  	  else $succeded = true;               // Authentication succeded.
-	  }
+		 // Gets user:
+		 if($options['userModelPtr']->validates()) {
+			 $user = $options['userModelPtr']->find(  // *Only finds the first match!
+				$options['username']." = '$username' AND ".$options['password']." = '$password'"
+			 );
+		 }
+		 if(empty($user)) $succeded = false;  // Authentication failed.
+		 else $succeded = true;               // Authentication succeded.
+		}
 
-	  // Writes id session var:
-    if($succeded)
-      $this->controller->Session->write($options['userId'], $user[$options['userModelPtr']->name]['id']);
+		// Writes id session var:
+	 if($succeded)
+		$this->controller->Session->write($options['userId'], $user[$options['userModelPtr']->name]['id']);
 
-    // If failed, renders a view:
-    if(!$succeded && $options['failed']['renderView']) {
-	    if(isset($data['Login']['fromURL']))                                 // and passes the return URL for the view to use
-        $this->controller->set('loginFromURL', $data['Login']['fromURL']);
+	 // If failed, renders a view:
+	 if(!$succeded && $options['failed']['renderView']) {
+		 if(isset($data['Login']['fromURL']))                                 // and passes the return URL for the view to use
+			$this->controller->set('loginFromURL', $data['Login']['fromURL']);
 
-      $options['userModelPtr']->invalidate($options['failed']['invalidate']);
-      $this->controller->render();
-      return;
-    }
+		$options['userModelPtr']->invalidate($options['failed']['invalidate']);
+		$this->controller->render();
+		return;
+	 }
 
-    // Succeded or not, calls post-login function (if declared): // XXX Podría mandar el $user a la función.
-    if($succeded && isset($options['succeded']['postLogin']))
-      call_user_func(array($this->controller, $options['succeded']['postLogin']));
-    else if(!$succeded && isset($options['failed']['postFailure']))
-      call_user_func(array($this->controller, $options['failed']['postFailure']));
+	 // Succeded or not, calls post-login function (if declared): // XXX Podría mandar el $user a la función.
+	 if($succeded && isset($options['succeded']['postLogin']))
+		call_user_func(array($this->controller, $options['succeded']['postLogin']));
+	 else if(!$succeded && isset($options['failed']['postFailure']))
+		call_user_func(array($this->controller, $options['failed']['postFailure']));
 
-    // and redirects,
+	 // and redirects,
 
-    // to the previous URL:
-    if(!$options['avoidReturn'] && isset($data['Login']['fromURL'])) {
-      if(!$succeded && isset($options['failed']['sessionErr']))         // - if session error option is used ...
-          $this->controller->Session->write($options['failed']['sessionErr'], true);  // ... it sets it = true -
-      if(isset($options[ $succeded ? 'succeded' : 'failed']['flashMsg'] )) $this->controller->flash( // with flash
-        $options[ $succeded ? 'succeded' : 'failed']['flashMsg'],
-        $data['Login']['fromURL']
-      );
-      else {
-        header("Location: {$data['Login']['fromURL']}"); // without flash
-        exit;
-      }
-    }
+	 // to the previous URL:
+	 if(!$options['avoidReturn'] && isset($data['Login']['fromURL'])) {
+		if(!$succeded && isset($options['failed']['sessionErr']))         // - if session error option is used ...
+			 $this->controller->Session->write($options['failed']['sessionErr'], true);  // ... it sets it = true -
+		if(isset($options[ $succeded ? 'succeded' : 'failed']['flashMsg'] )) $this->controller->flash( // with flash
+			$options[ $succeded ? 'succeded' : 'failed']['flashMsg'],
+			$data['Login']['fromURL']
+		);
+		else {
+			header("Location: {$data['Login']['fromURL']}"); // without flash
+			exit;
+		}
+	 }
 
-    // or to the given cake url:
-    if(isset($options[ $succeded ? 'succeded' : 'failed' ]['flashMsg'])) // with flash
-      $this->controller->flash(
-        $options[ $succeded ? 'succeded' : 'failed' ]['flashMsg'],
-        $options[ $succeded ? 'succeded' : 'failed' ]['URL']
-       );
-    else $this->controller->redirect($options[$succeded?'succeded':'failed']['URL']); // or without flash.
-  }
+	 // or to the given cake url:
+	 if(isset($options[ $succeded ? 'succeded' : 'failed' ]['flashMsg'])) // with flash
+		$this->controller->flash(
+			$options[ $succeded ? 'succeded' : 'failed' ]['flashMsg'],
+			$options[ $succeded ? 'succeded' : 'failed' ]['URL']
+		 );
+	 else $this->controller->redirect($options[$succeded?'succeded':'failed']['URL']); // or without flash.
+	}
 
-  /**
-   * Destroys cakephp's session and redirects or flashes.
-   * No view rendering.
-   *
-   * Use data['Logout']['fromURL'] to tell to which cake's sintaxed URL to return after logout.
-   *
-   * @author Jorge Orpinel
-   * @param logouOptions is an array with the following default, overwritable-by-parts structure:
-   * avoidReturn => false  // Use to ensure no returnURLs are used
-   * flashMsg => null      // If false, redirect is used. Ignored if return is true
-   * sessionFlash => null  // If set, a SessionHelper::setFlash() method is invoked with it.
-   * URL => '/'            // Ignored if the returnURL is used
-   */
-  function logout($logoutOptions = null) {
-    $this->controller->Session->destroy();
+	/**
+	* Destroys cakephp's session and redirects or flashes.
+	* No view rendering.
+	*
+	* Use data['Logout']['fromURL'] to tell to which cake's sintaxed URL to return after logout.
+	*
+	* @author Jorge Orpinel
+	* @param logouOptions is an array with the following default, overwritable-by-parts structure:
+	* avoidReturn => false  // Use to ensure no returnURLs are used
+	* flashMsg => null      // If false, redirect is used. Ignored if return is true
+	* sessionFlash => null  // If set, a SessionHelper::setFlash() method is invoked with it.
+	* URL => '/'            // Ignored if the returnURL is used
+	*/
+	function logout($logoutOptions = null) {
+	 $this->controller->Session->destroy();
 
-    $options = array(
-      'avoidReturn' => isset($logoutOptions['avoidReturn'])?$logoutOptions['avoidReturn']:false,
-      'flashMsg' => isset($logoutOptions['flashMsg'])?$logoutOptions['flashMsg']:null,
-      'sessionFlash' => isset($logoutOptions['sessionFlash'])?$logoutOptions['sessionFlash']:null,
-      'URL' => isset($logoutOptions['URL'])?$logoutOptions['URL']:'/'
-    );
+	 $options = array(
+		'avoidReturn' => isset($logoutOptions['avoidReturn'])?$logoutOptions['avoidReturn']:false,
+		'flashMsg' => isset($logoutOptions['flashMsg'])?$logoutOptions['flashMsg']:null,
+		'sessionFlash' => isset($logoutOptions['sessionFlash'])?$logoutOptions['sessionFlash']:null,
+		'URL' => isset($logoutOptions['URL'])?$logoutOptions['URL']:'/'
+	 );
 
-    if(isset($options['sessionFlash'])) $this->controller->Session->setFlash($options['sessionFlash']);
+	 if(isset($options['sessionFlash'])) $this->controller->Session->setFlash($options['sessionFlash']);
 
-    if(isset($options['flashMsg']))                          // Flashes
-      if(isset($this->controller->data['Logout']['fromURL']))
-        $this->controller->flash(                            // to the return URL
-          $options['flashMsg'],
-          $this->controller->data['Logout']['fromURL']);
-      else
-        $this->controller->flash(                            // or to the option's URL.
-          $options['flashMsg'],
-          $options['URL']);
-    else                                                                               // Redirects
-      if(!$options['avoidReturn']&&isset($this->controller->data['Logout']['fromURL']))
-        header("Location: {$this->controller->data['Logout']['fromURL']}");            // to the return URL
-      else
-        $this->controller->redirect($options['URL']);                                   //  or to the option's URL.
-  }
+	 if(isset($options['flashMsg']))                          // Flashes
+		if(isset($this->controller->data['Logout']['fromURL']))
+			$this->controller->flash(                            // to the return URL
+			 $options['flashMsg'],
+			 $this->controller->data['Logout']['fromURL']);
+		else
+			$this->controller->flash(                            // or to the option's URL.
+			 $options['flashMsg'],
+			 $options['URL']);
+	 else                                                                               // Redirects
+		if(!$options['avoidReturn']&&isset($this->controller->data['Logout']['fromURL']))
+			header("Location: {$this->controller->data['Logout']['fromURL']}");            // to the return URL
+		else
+			$this->controller->redirect($options['URL']);                                   //  or to the option's URL.
+	}
 }
 ?>
