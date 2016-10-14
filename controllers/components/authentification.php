@@ -25,7 +25,7 @@ class AuthenticationComponent {
 	}
 
 	/**
-	* Verifies the existence of a user with a username and a password.
+	 * Verifies the existence of a user with a username and a password.
 	 * Assumes there is no repeated usernames in the users model's data.
 	 *
 	 * Use data['Login']['fromURL'] to tell to which cake's sintaxed URL to return after login.
